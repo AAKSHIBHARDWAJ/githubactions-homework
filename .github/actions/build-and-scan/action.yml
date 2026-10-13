@@ -24,7 +24,7 @@ inputs:
 outputs:
   image_uri:
     description: 'Full URI of the pushed image'
-    value: ghcr.io/${{ github.repository_owner_lower }}/${{ inputs.image_name }}:${{ inputs.tag }}
+    value: ghcr.io/${{ github.repository }}/${{ inputs.image_name }}:${{ inputs.tag }}
 
 runs:
   using: 'composite'
@@ -38,12 +38,11 @@ runs:
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile }}
         push: true
-        tags: ghcr.io/${{ github.repository_owner_lower }}/${{ inputs.image_name }}:${{ inputs.tag }}
-
+        tags: ghcr.io/${{ github.repository }}/${{ inputs.image_name }}:${{ inputs.tag }}
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ghcr.io/${{ github.repository_owner_lower }}/${{ inputs.image_name }}:${{ inputs.tag }}
+        image-ref: ghcr.io/${{ github.repository }}/${{ inputs.image_name }}:${{ inputs.tag }}
         format: 'sarif'
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
