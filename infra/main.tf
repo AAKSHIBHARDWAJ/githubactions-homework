@@ -3,8 +3,16 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "my-insecure-test-bucket-123456"
+  bucket = "my-secure-test-bucket-123456"
 }
+
+resource "aws_s3_bucket_versioning" "versioning_example" {
+  bucket = aws_s3_bucket.my_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
   bucket = aws_s3_bucket.my_bucket.id
 
