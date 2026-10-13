@@ -1,0 +1,35 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run custom build and scan action
+        id: build-scan
+        uses: ./.github/actions/build-and-scan
+        with:
+          image_name: my-app
+          tag: ${{ github.sha }}
+
+      - name: Print image URI
+        run: |
+          echo "Pushed Image URI is: ${{ steps.build-scan.outputs.image_uri }}"
