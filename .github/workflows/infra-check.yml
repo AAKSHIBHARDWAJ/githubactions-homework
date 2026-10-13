@@ -1,0 +1,21 @@
+name: Infrastructure Check
+
+on:
+  workflow_call:
+    inputs:
+      working_dir:
+        required: true
+        type: string
+
+jobs:
+  checkov:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov action
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ${{ inputs.working_dir }}
+          framework: terraform
