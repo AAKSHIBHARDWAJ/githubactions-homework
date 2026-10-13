@@ -1,0 +1,11 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  call-infra-check:
+    uses: ./.github/workflows/infra-check.yml
+    with:
+      working_dir: 'infra'
