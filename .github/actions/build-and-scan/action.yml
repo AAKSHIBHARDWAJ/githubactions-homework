@@ -24,11 +24,20 @@ inputs:
 outputs:
   image_uri:
     description: 'Full URI of the pushed image'
-    value: ghcr.io/${{ github.repository }}/${{ inputs.image_name }}:${{ inputs.tag }}
+    value: ${{ steps.prep.outputs.image_uri }}
 
 runs:
   using: 'composite'
   steps:
+    - name: Prepare lowercase image URI
+      id: prep
+      shell: bash
+      run: |
+        REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+        URI="ghcr.io/${REPO_LOWER}/${{ inputs.image_name }}:${{ inputs.tag }}"
+        echo "image_uri=${URI}" >> $GITHUB_OUTPUT
+        echo "IMAGE_URI=${URI}" >> $GITHUB_ENV
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -38,11 +47,12 @@ runs:
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile }}
         push: true
-        tags: ghcr.io/${{ github.repository }}/${{ inputs.image_name }}:${{ inputs.tag }}
+        tags: ${{ env.IMAGE_URI }}
+
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ghcr.io/${{ github.repository }}/${{ inputs.image_name }}:${{ inputs.tag }}
+        image-ref: ${{ env.IMAGE_URI }}
         format: 'sarif'
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
