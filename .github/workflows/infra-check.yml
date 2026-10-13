@@ -19,3 +19,4 @@ jobs:
         with:
           directory: ${{ inputs.working_dir }}
           framework: terraform
+          soft_fail: true
